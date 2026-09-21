@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Dados (nunca versionar dados brutos/processados)
+dados/
+*.zip
+*.csv
+
+# Variáveis de ambiente e segredos
+.env
+
+# Editor / SO
+.vscode/
+.DS_Store
