@@ -1,6 +1,7 @@
 import requests
 from pathlib import Path
 import zipfile
+import pandas as pd
 
 def build_download_url (year: int) -> str:
     return f"https://www.bcb.gov.br/pda/desig/scrdata_{year}.zip"
@@ -29,5 +30,22 @@ zip_path = Path("dados/raw/scr_data/scrdata_2025.zip")
 
 with zipfile.ZipFile(zip_path) as zf:
     with zf.open("scrdata_202501.csv") as f:
-        for _ in range(3):
-            print(f.readline())
+        df = pd.read_csv(f, sep=";", decimal=',', encoding='utf-8-sig')
+
+print(df.shape)
+print(df.dtypes)
+print(df.head())
+
+SUPRESSAO_OPERACOES = -1  # sentinela: contagem suprimida (indício, não documentado na Metodologia V2 — ver README)
+
+qtd_suprimidas = (df["numero_de_operacoes"] == SUPRESSAO_OPERACOES).sum()
+print("linhas suprimidas:", qtd_suprimidas, "de", len(df))
+
+df["numero_de_operacoes"] = (
+    df["numero_de_operacoes"]
+    .replace(SUPRESSAO_OPERACOES, pd.NA)
+    .astype("Int64")
+)
+
+print(df["numero_de_operacoes"].dtype)
+print(df["numero_de_operacoes"].isna().sum())
